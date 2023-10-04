@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { firstNames, lastNames } from "./mock";
 
 // Определяем интерфейс для справочника сотрудников
 interface IEmployee {
@@ -6,12 +7,16 @@ interface IEmployee {
     birthDate: Date;
     gender: string;
 }
-
 // Определяем схему для справочника сотрудников
 const EmployeeSchema: Schema = new Schema({
-    fullName: { type: String, required: true },
+    fullName: { type: String, required: true, index: true },
     birthDate: { type: Date, required: true },
-    gender: { type: String, enum: ["Male", "Female"], required: true },
+    gender: {
+        type: String,
+        enum: ["Male", "Female"],
+        required: true,
+        index: true,
+    },
 });
 
 // Регистрируем модель Employee
@@ -68,67 +73,10 @@ class Employee {
         }
     }
 }
-
 // Функция для создания 100 случайных сотрудников
 function createRandomEmployees(count: number): Employee[] {
     const employees: Employee[] = [];
     const genders = ["Male", "Female"];
-    const firstNames = [
-        "Adam",
-        "Bob",
-        "Charlie",
-        "David",
-        "Edward",
-        "Frank",
-        "George",
-        "Henry",
-        "Isaac",
-        "John",
-        "Kevin",
-        "Larry",
-        "Michael",
-        "Nathan",
-        "Oscar",
-        "Peter",
-        "Quentin",
-        "Robert",
-        "Steven",
-        "Thomas",
-        "Ulysses",
-        "Victor",
-        "William",
-        "Xavier",
-        "Yuri",
-        "Zachary",
-    ];
-    const lastNames = [
-        "Adams",
-        "Baker",
-        "Clark",
-        "Davis",
-        "Edwards",
-        "Franklin",
-        "Garcia",
-        "Harris",
-        "Irwin",
-        "Johnson",
-        "Klein",
-        "Lee",
-        "Miller",
-        "Nelson",
-        "Owens",
-        "Perez",
-        "Quinn",
-        "Robinson",
-        "Smith",
-        "Taylor",
-        "Upton",
-        "Vargas",
-        "Williams",
-        "Xu",
-        "Young",
-        "Zhang",
-    ];
 
     for (let i = 0; i < count; i++) {
         const gender = genders[Math.floor(Math.random() * genders.length)];
@@ -136,7 +84,7 @@ function createRandomEmployees(count: number): Employee[] {
             firstNames[Math.floor(Math.random() * firstNames.length)];
         const lastName =
             lastNames[Math.floor(Math.random() * lastNames.length)];
-        const fullName = `${firstName} ${lastName}`;
+        const fullName = `${lastName} ${firstName}`;
         const birthYear = Math.floor(Math.random() * (2003 - 1950 + 1)) + 1950;
         const birthMonth = Math.floor(Math.random() * 12) + 1;
         const birthDay = Math.floor(Math.random() * 28) + 1;
@@ -152,39 +100,11 @@ function createFLastNameEmployees(count: number): Employee[] {
     const employees: Employee[] = [];
     const gender = "Male";
     const lastName = "Fisher";
-    const firstNames = [
-        "Adam",
-        "Bob",
-        "Charlie",
-        "David",
-        "Edward",
-        "Frank",
-        "George",
-        "Henry",
-        "Isaac",
-        "John",
-        "Kevin",
-        "Larry",
-        "Michael",
-        "Nathan",
-        "Oscar",
-        "Peter",
-        "Quentin",
-        "Robert",
-        "Steven",
-        "Thomas",
-        "Ulysses",
-        "Victor",
-        "William",
-        "Xavier",
-        "Yuri",
-        "Zachary",
-    ];
 
     for (let i = 0; i < count; i++) {
         const firstName =
             firstNames[Math.floor(Math.random() * firstNames.length)];
-        const fullName = `${firstName} ${lastName}`;
+        const fullName = `${lastName} ${firstName}`;
         const birthYear = Math.floor(Math.random() * (2003 - 1950 + 1)) + 1950;
         const birthMonth = Math.floor(Math.random() * 12) + 1;
         const birthDay = Math.floor(Math.random() * 28) + 1;
@@ -259,7 +179,6 @@ async function printAllEmployees() {
 // Получаем режим работы из аргументов командной строки
 const mode = process.argv[2];
 
-// Основная логика приложения
 async function main() {
     await connectToDatabase();
 
@@ -288,6 +207,22 @@ async function main() {
         }
 
         console.log("Employees table created!");
+    } else if (mode === "5") {
+        console.time("Query time");
+        const employees = await EmployeeModel.find(
+            { gender: "Male", fullName: { $regex: /^F/ } },
+            { fullName: 1, gender: 1 }
+        ).lean();
+
+        for (const employee of employees) {
+            employee.fullName, employee.gender;
+
+            console.log(
+                `Full Name: ${employee.fullName}, Gender: ${employee.gender}`
+            );
+        }
+
+        console.timeEnd("Query time");
     } else {
         console.log("Invalid mode. Please provide a valid mode.");
     }
@@ -295,8 +230,15 @@ async function main() {
     // Закрываем соединение с базой данных после завершения работы
     mongoose.connection.close();
 }
-
 main();
 // npm init
-// скомпилировать tsc myApp.ts
-// Запускаем приложение: node myApp.js 1 // и аргумент - это номер режима
+// скомпилировать tsc myAp1.ts
+// Запускаем приложение: node myApp1.js /*arg*/ // аргумент - это номер режима
+// для оптимизации провели индексирование полей gender and fullName,
+// что позволило ускорить выполнение запроса, позволяя MongoDB быстро 
+// находить соответствующие документы используя проекцию
+// так же убрал блок try catch что позволило сократить затрачиваемые 
+// ресурсы на перехват и обработку ошибок
+// Однако, если в коде есть возможность возникновения ошибок, то 
+// использование блока try-catch может повысить надежность и 
+// устойчивость приложения

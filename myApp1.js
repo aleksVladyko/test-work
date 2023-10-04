@@ -1,5 +1,4 @@
 "use strict";
-// import mongoose, { Document, Schema } from "mongoose";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46,139 +45,18 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// // Определяем интерфейс для справочника сотрудников
-// interface IEmployee {
-//     fullName: string;
-//     birthDate: Date;
-//     gender: string;
-// }
-// // Определяем схему для справочника сотрудников
-// const EmployeeSchema: Schema = new Schema({
-//     fullName: { type: String, required: true },
-//     birthDate: { type: Date, required: true },
-//     gender: { type: String, enum: ["Male", "Female"], required: true },
-// });
-// // Регистрируем модель Employee
-// const EmployeeModel = mongoose.model<IEmployee>("Employee", EmployeeSchema);
-// // Определяем класс для сотрудника
-// class Employee {
-//     constructor(
-//         public fullName: string,
-//         public birthDate: Date,
-//         public gender: string
-//     ) {}
-//     calculateAge(): number {
-//         const today = new Date();
-//         const birthDate = new Date(this.birthDate);
-//         let age = today.getFullYear() - birthDate.getFullYear();
-//         const monthDiff = today.getMonth() - birthDate.getMonth();
-//         if (
-//             monthDiff < 0 ||
-//             (monthDiff === 0 && today.getDate() < birthDate.getDate())
-//         ) {
-//             age--;
-//         }
-//         return age;
-//     }
-//     async saveToDatabase(): Promise<void> {
-//         const employeeData: IEmployee = {
-//             fullName: this.fullName,
-//             birthDate: this.birthDate,
-//             gender: this.gender,
-//         };
-//         try {
-//             await EmployeeModel.create(employeeData);
-//             console.log("Employee record saved to the database!");
-//         } catch (error) {
-//             console.error("Failed to save employee record:", error);
-//         }
-//     }
-// }
-// // Параметры подключения к базе данных MongoDB
-// const DB_HOST = "mongodb://localhost:27017";
-// const DB_NAME = "test";
-// // Функция для подключения к базе данных
-// async function connectToDatabase() {
-//     try {
-//         await mongoose.connect(`${DB_HOST}/${DB_NAME}`);
-//         console.log("Connected to the database!");
-//     } catch (error) {
-//         console.error("Failed to connect to the database:", error);
-//     }
-// }
-// // Функция для создания таблицы сотрудников
-// async function createEmployeeTable() {
-//     const employees: Employee[] = [
-//         new Employee("John Doe", new Date("1980-01-01"), "Male"),
-//         new Employee("Jane Smith", new Date("1990-05-15"), "Female"),
-//         // Добавьте других сотрудников по аналогии
-//     ];
-//     try {
-//         for (const employee of employees) {
-//             await employee.saveToDatabase();
-//             const age = employee.calculateAge();
-//             console.log(`Employee age: ${age}`);
-//         }
-//         console.log("Employee table created!");
-//     } catch (error) {
-//         console.error("Failed to create employee table:", error);
-//     }
-// }
-// // Функция для вывода всех записей из базы данных
-// async function printAllEmployees() {
-//     try {
-//         const employees = await EmployeeModel.find()
-//             .sort({ fullName: 1 })
-//             .lean();
-//         for (const employee of employees) {
-//             const age = new Employee(
-//                 employee.fullName,
-//                 employee.birthDate,
-//                 employee.gender
-//             ).calculateAge();
-//             console.log(
-//                 `Full Name: ${
-//                     employee.fullName
-//                 }, Birth Date: ${employee.birthDate.toDateString()}, Gender: ${
-//                     employee.gender
-//                 }, Age: ${age}`
-//             );
-//         }
-//     } catch (error) {
-//         console.error("Failed to print all employees:", error);
-//     }
-// }
-// // Получаем режим работы из аргументов командной строки
-// const mode = process.argv[2];
-// // Основная логика приложения
-// async function main() {
-//     await connectToDatabase();
-//     if (mode === "1") {
-//         await createEmployeeTable();
-//     } else if (mode === "2") {
-//         const fullName = process.argv[3];
-//         const birthDate = process.argv[4];
-//         const gender = process.argv[5];
-//         const employee = new Employee(fullName, new Date(birthDate), gender);
-//         await employee.saveToDatabase();
-//         const age = employee.calculateAge();
-//         console.log(`Employee age: ${age}`);
-//     } else if (mode === "3") {
-//         await printAllEmployees();
-//     } else {
-//         console.log("Invalid mode. Please provide a valid mode.");
-//     }
-//     // Закрываем соединение с базой данных после завершения работы
-//     mongoose.connection.close();
-// }
-// // Запускаем приложение
-// main();
 var mongoose_1 = require("mongoose");
+var mock_1 = require("./mock");
 // Определяем схему для справочника сотрудников
 var EmployeeSchema = new mongoose_1.Schema({
-    fullName: { type: String, required: true },
+    fullName: { type: String, required: true, index: true },
     birthDate: { type: Date, required: true },
-    gender: { type: String, enum: ["Male", "Female"], required: true },
+    gender: {
+        type: String,
+        enum: ["Male", "Female"],
+        required: true,
+        index: true,
+    },
 });
 // Регистрируем модель Employee
 var EmployeeModel = mongoose_1.default.model("Employee", EmployeeSchema);
@@ -242,8 +120,10 @@ var Employee = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
+                        // insertMany(): метод mongoDB добавляет несколько документов
                         return [4 /*yield*/, EmployeeModel.insertMany(employeeData)];
                     case 2:
+                        // insertMany(): метод mongoDB добавляет несколько документов
                         _a.sent();
                         console.log("Employees saved to the database!");
                         return [3 /*break*/, 4];
@@ -262,67 +142,11 @@ var Employee = /** @class */ (function () {
 function createRandomEmployees(count) {
     var employees = [];
     var genders = ["Male", "Female"];
-    var firstNames = [
-        "Adam",
-        "Bob",
-        "Charlie",
-        "David",
-        "Edward",
-        "Frank",
-        "George",
-        "Henry",
-        "Isaac",
-        "John",
-        "Kevin",
-        "Larry",
-        "Michael",
-        "Nathan",
-        "Oscar",
-        "Peter",
-        "Quentin",
-        "Robert",
-        "Steven",
-        "Thomas",
-        "Ulysses",
-        "Victor",
-        "William",
-        "Xavier",
-        "Yuri",
-        "Zachary",
-    ];
-    var lastNames = [
-        "Adams",
-        "Baker",
-        "Clark",
-        "Davis",
-        "Edwards",
-        "Franklin",
-        "Garcia",
-        "Harris",
-        "Irwin",
-        "Johnson",
-        "Klein",
-        "Lee",
-        "Miller",
-        "Nelson",
-        "Owens",
-        "Perez",
-        "Quinn",
-        "Robinson",
-        "Smith",
-        "Taylor",
-        "Upton",
-        "Vargas",
-        "Williams",
-        "Xu",
-        "Young",
-        "Zhang",
-    ];
     for (var i = 0; i < count; i++) {
         var gender = genders[Math.floor(Math.random() * genders.length)];
-        var firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        var lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        var fullName = "".concat(firstName, " ").concat(lastName);
+        var firstName = mock_1.firstNames[Math.floor(Math.random() * mock_1.firstNames.length)];
+        var lastName = mock_1.lastNames[Math.floor(Math.random() * mock_1.lastNames.length)];
+        var fullName = "".concat(lastName, " ").concat(firstName);
         var birthYear = Math.floor(Math.random() * (2003 - 1950 + 1)) + 1950;
         var birthMonth = Math.floor(Math.random() * 12) + 1;
         var birthDay = Math.floor(Math.random() * 28) + 1;
@@ -336,37 +160,9 @@ function createFLastNameEmployees(count) {
     var employees = [];
     var gender = "Male";
     var lastName = "Fisher";
-    var firstNames = [
-        "Adam",
-        "Bob",
-        "Charlie",
-        "David",
-        "Edward",
-        "Frank",
-        "George",
-        "Henry",
-        "Isaac",
-        "John",
-        "Kevin",
-        "Larry",
-        "Michael",
-        "Nathan",
-        "Oscar",
-        "Peter",
-        "Quentin",
-        "Robert",
-        "Steven",
-        "Thomas",
-        "Ulysses",
-        "Victor",
-        "William",
-        "Xavier",
-        "Yuri",
-        "Zachary",
-    ];
     for (var i = 0; i < count; i++) {
-        var firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        var fullName = "".concat(firstName, " ").concat(lastName);
+        var firstName = mock_1.firstNames[Math.floor(Math.random() * mock_1.firstNames.length)];
+        var fullName = "".concat(lastName, " ").concat(firstName);
         var birthYear = Math.floor(Math.random() * (2003 - 1950 + 1)) + 1950;
         var birthMonth = Math.floor(Math.random() * 12) + 1;
         var birthDay = Math.floor(Math.random() * 28) + 1;
@@ -471,10 +267,9 @@ function printAllEmployees() {
 }
 // Получаем режим работы из аргументов командной строки
 var mode = process.argv[2];
-// Основная логика приложения
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var fullName, birthDate, gender, employee, age, randomEmployees, fLastNameEmployees, employees, batchSize, i, batch;
+        var fullName, birthDate, gender, employee, age, randomEmployees, fLastNameEmployees, employees, batchSize, i, batch, employees, _i, employees_3, employee;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, connectToDatabase()];
@@ -484,7 +279,7 @@ function main() {
                     return [4 /*yield*/, createEmployeeTable()];
                 case 2:
                     _a.sent();
-                    return [3 /*break*/, 13];
+                    return [3 /*break*/, 15];
                 case 3:
                     if (!(mode === "2")) return [3 /*break*/, 5];
                     fullName = process.argv[3];
@@ -496,13 +291,13 @@ function main() {
                     _a.sent();
                     age = employee.calculateAge();
                     console.log("Employee age: ".concat(age));
-                    return [3 /*break*/, 13];
+                    return [3 /*break*/, 15];
                 case 5:
                     if (!(mode === "3")) return [3 /*break*/, 7];
                     return [4 /*yield*/, printAllEmployees()];
                 case 6:
                     _a.sent();
-                    return [3 /*break*/, 13];
+                    return [3 /*break*/, 15];
                 case 7:
                     if (!(mode === "4")) return [3 /*break*/, 12];
                     randomEmployees = createRandomEmployees(200);
@@ -523,16 +318,32 @@ function main() {
                     return [3 /*break*/, 8];
                 case 11:
                     console.log("Employees table created!");
-                    return [3 /*break*/, 13];
+                    return [3 /*break*/, 15];
                 case 12:
-                    console.log("Invalid mode. Please provide a valid mode.");
-                    _a.label = 13;
+                    if (!(mode === "5")) return [3 /*break*/, 14];
+                    console.time("Query time");
+                    return [4 /*yield*/, EmployeeModel.find({ gender: "Male", fullName: { $regex: /^F/ } }, { fullName: 1, gender: 1 }).lean()];
                 case 13:
+                    employees = _a.sent();
+                    for (_i = 0, employees_3 = employees; _i < employees_3.length; _i++) {
+                        employee = employees_3[_i];
+                        employee.fullName, employee.gender;
+                        console.log("Full Name: ".concat(employee.fullName, ", Gender: ").concat(employee.gender));
+                    }
+                    console.timeEnd("Query time");
+                    return [3 /*break*/, 15];
+                case 14:
+                    console.log("Invalid mode. Please provide a valid mode.");
+                    _a.label = 15;
+                case 15:
                     // Закрываем соединение с базой данных после завершения работы
                     mongoose_1.default.connection.close();
                     return [2 /*return*/];
             }
         });
     });
-} // Запускаем приложение
+}
 main();
+// npm init
+// скомпилировать tsc myAp1.ts
+// Запускаем приложение: node myApp.js /*arg*/ // аргумент - это номер режима

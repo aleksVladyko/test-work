@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+mock.js
+myApp.js
+myApp1.js
