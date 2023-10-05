@@ -150,7 +150,7 @@ async function createEmployeeTable() {
 }
 
 // Функция для вывода всех записей из базы данных
-async function printAllEmployees() {
+async function printAllEmployees(): Promise<void> {
     try {
         const employees = await EmployeeModel.find()
             .sort({ fullName: 1 })
@@ -173,7 +173,9 @@ async function printAllEmployees() {
         }
     } catch (error) {
         console.error("Failed to print all employees:", error);
+        throw error;
     }
+    return;
 }
 
 // Получаем режим работы из аргументов командной строки
